@@ -1,9 +1,8 @@
 import express from "express";
 import cors from "cors";
 import env from "dotenv";
+import { data } from "./data.js";
 env.config();
-
-const data = [];
 
 const app = express();
 app.use(
@@ -15,13 +14,12 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-  res.json({ data }).status(200);
-});
-
-app.post("/", (req, res) => {
-  const dataBody = req.body;
-  data.push(dataBody);
-  res.json({ dataBody }).status(200);
+  if (
+    req.query.api_key === process.env.API_KEY &&
+    req.headers["authorization"] === process.env.AUTHORIZATION_TOKEN
+  )
+    return res.json({ data }).status(200);
+  else return res.json({ message: "Unauthorized" }).status(401);
 });
 
 app.listen(process.env.PORT, () => console.log("H"));
